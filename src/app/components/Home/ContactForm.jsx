@@ -131,7 +131,7 @@ function ContactForm() {
                     </div>
                     <button
                         type="button"
-                        onClick={sendOtp}
+                        onClick={() => sendOtp()}
                         className="bg-gradient-to-r from-[#080a62] to-[#dc3d52] text-white font-medium py-3 px-4 rounded-lg shadow-md hover:opacity-90 transition-all duration-300"
                     >
                         {otpSent ? "OTP Sent" : "Send OTP"}
@@ -157,7 +157,7 @@ function ContactForm() {
                         </div>
                         <button
                             type="button"
-                            onClick={verifyOtp}
+                            onClick={() => verifyOtp()}
                             className="bg-gradient-to-r from-[#080a62] to-[#dc3d52] text-white font-medium py-3 px-6 rounded-lg shadow-md hover:opacity-90 transition-all duration-300 mt-0"
                         >
                             Verify OTP
