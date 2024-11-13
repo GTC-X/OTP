@@ -1,7 +1,7 @@
 // src/app/api/otpStorage.js
 import fs from 'fs';
 import path from 'path';
-const otpFilePath = path.resolve(process.cwd(), 'otp.json');
+const otpFilePath = path.resolve(process.cwd(),'public','otps', 'otp.json');
 
 // Helper function to read the current contents of otp.json
 function readOtpFile() {
