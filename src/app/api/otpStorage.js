@@ -9,7 +9,8 @@ function readOtpFile() {
     const data = fs.readFileSync(otpFilePath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    return {}; // Return an empty object if there's an error
+    console.log({ error })
+    return error // Return an empty object if there's an error
   }
 }
 
