@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 
 const HeroBanner = () => {
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
