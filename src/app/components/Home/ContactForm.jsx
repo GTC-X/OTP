@@ -1,12 +1,15 @@
-'use client'
+'use client';
 import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { ToastContainer, toast } from 'react-toastify';
 
 function ContactForm() {
-    const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({
+    const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({
         mode: "onChange"
     });
     const [otpSent, setOtpSent] = useState(false);
+    const [otpValues, setOtpValues] = useState(Array(6).fill('')); // Array to store OTP digits
+    const watchAllFields = watch();
     const otpRefs = Array.from({ length: 6 }, () => useRef(null));
 
     const onSubmit = (data) => {
@@ -22,19 +25,54 @@ function ContactForm() {
         setOtpSent(false);
     };
 
-    const handleSendOtp = () => {
-        alert("OTP has been sent to your phone number.");
-        setOtpSent(true);
+    const sendOtp = async () => {
+        try {
+            const response = await fetch('/api/sentOtp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: watchAllFields?.phone }),
+            });
+            const data = await response.json();
+            if (data?.success) {
+                setOtpSent(true);
+                toast.success("OTP sent Successfully")
+            }
+        } catch (error) {
+            toast.error('Error sending OTP:', error);
+        }
     };
 
-    const handleVerifyOtp = () => {
-        alert("OTP Verified!");
-        setOtpSent(false);
+    const verifyOtp = async () => {
+        const otp = otpValues.join(''); // Combine OTP values into a single string
+        try {
+            const response = await fetch('/api/verifyOtp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: watchAllFields?.phone, otp }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                toast.success("OTP Verified!");
+                setOtpSent(false);
+            } else {
+                toast.error("Invalid OTP!");
+            }
+        } catch (error) {
+            toast.error('Error verifying OTP:', error);
+        }
     };
 
     const handleOtpChange = (e, index) => {
-        if (e.target.value.length === 1 && index < otpRefs.length - 1) {
-            otpRefs[index + 1].current.focus();
+        const value = e.target.value;
+        if (/^\d$/.test(value) || value === '') { // Ensure only digits are entered
+            const newOtpValues = [...otpValues];
+            newOtpValues[index] = value;
+            setOtpValues(newOtpValues);
+
+            // Move focus to the next input if the current one is filled
+            if (value && index < otpRefs.length - 1) {
+                otpRefs[index + 1].current.focus();
+            }
         }
     };
 
@@ -93,7 +131,7 @@ function ContactForm() {
                     </div>
                     <button
                         type="button"
-                        onClick={handleSendOtp}
+                        onClick={sendOtp}
                         className="bg-gradient-to-r from-[#080a62] to-[#dc3d52] text-white font-medium py-3 px-4 rounded-lg shadow-md hover:opacity-90 transition-all duration-300"
                     >
                         {otpSent ? "OTP Sent" : "Send OTP"}
@@ -104,7 +142,7 @@ function ContactForm() {
                 {otpSent && (
                     <div className="flex flex-row justify-between items-baseline space-y-4">
                         <div className="flex gap-2">
-                            {[...Array(6)].map((_, index) => (
+                            {otpValues.map((_, index) => (
                                 <input
                                     key={index}
                                     ref={otpRefs[index]}
@@ -112,13 +150,14 @@ function ContactForm() {
                                     maxLength="1"
                                     className="w-20 h-12 text-center border rounded-md text-gray-700 focus:outline-none"
                                     placeholder="-"
+                                    value={otpValues[index]}
                                     onChange={(e) => handleOtpChange(e, index)}
                                 />
                             ))}
                         </div>
                         <button
                             type="button"
-                            onClick={handleVerifyOtp}
+                            onClick={verifyOtp}
                             className="bg-gradient-to-r from-[#080a62] to-[#dc3d52] text-white font-medium py-3 px-6 rounded-lg shadow-md hover:opacity-90 transition-all duration-300 mt-0"
                         >
                             Verify OTP
