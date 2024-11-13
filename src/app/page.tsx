@@ -5,18 +5,19 @@ import ConsultationSection from './components/Home/ConsultationSection';
 import FAQSection from './components/Home/FAQSection'
 import WhyChooseUsSection from './components/Home/WhyChooseUs'
 import ContactForm from './components/Home/ContactForm'
+import OtpComponent from './otpHandler'
 
 export default function Home() {
   return (
     <>
-    <HeroBanner />
-    <ServicesSection />
+      <HeroBanner />
+      <ServicesSection />
+      <OtpComponent />
+      <WhyChooseUsSection />
+      <FAQSection />
+      <ConsultationSection />
+      <ContactForm />
 
-    <WhyChooseUsSection />
-    <FAQSection />
-    <ConsultationSection />
-    <ContactForm/>
-    
     </>
   );
 }
