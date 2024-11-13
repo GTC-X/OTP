@@ -2,7 +2,7 @@
 import fs from 'fs/promises';  // Using async file operations
 import path from 'path';
 
-const otpFilePath = path.resolve(process.cwd(), 'public', 'otps', 'otp.json');
+const otpFilePath = path.resolve('/tmp', 'otp.json');
 
 // Helper function to read the current contents of otp.json
 async function readOtpFile() {
