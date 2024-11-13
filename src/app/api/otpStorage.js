@@ -1,50 +1,63 @@
 // src/app/api/otpStorage.js
-import fs from 'fs';
+import fs from 'fs/promises';  // Using async file operations
 import path from 'path';
+
 const otpFilePath = path.resolve(process.cwd(), 'public', 'otps', 'otp.json');
 
 // Helper function to read the current contents of otp.json
-function readOtpFile() {
+async function readOtpFile() {
   try {
-    const data = fs.readFileSync(otpFilePath, 'utf8');
+    const data = await fs.readFile(otpFilePath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    console.log({ error })
-    return error // Return an empty object if there's an error
+    console.error("Error reading OTP file:", error);
+    return {};  // Return an empty object if there's an error
   }
 }
 
 // Helper function to write data to otp.json
-function writeOtpFile(data) {
+async function writeOtpFile(data) {
   try {
-    // Synchronously write to ensure data is flushed to disk immediately
-    fs.writeFileSync(otpFilePath, JSON.stringify(data, null, 2), 'utf8');
+    await fs.writeFile(otpFilePath, JSON.stringify(data, null, 2), 'utf8');
   } catch (error) {
+    console.error("Error writing OTP file:", error);
   }
 }
 
 // Function to store OTP for a given phone number
-export function storeOtp(phoneNumber, otp) {
-  console.log("stored otp", { otp, phoneNumber })
-  const otpData = readOtpFile();
-  otpData[phoneNumber] = otp;
-  writeOtpFile(otpData);
+export async function storeOtp(phoneNumber, otp) {
+  console.log("Storing OTP", { otp, phoneNumber });
+  const otpData = await readOtpFile();
+  otpData[phoneNumber] = { otp, timestamp: Date.now() }; // Adds a timestamp
+  await writeOtpFile(otpData);
 }
 
 // Function to retrieve the OTP for a given phone number
-export function getOtp(phoneNumber) {
-  const otpData = readOtpFile();
-  console.log("get otp", { otpData, phoneNumber })
-
-  return otpData[phoneNumber];
+export async function getOtp(phoneNumber) {
+  const otpData = await readOtpFile();
+  const otpEntry = otpData[phoneNumber];
+  console.log("otpEntry", otpEntry);
+  if (otpEntry) {
+    console.log("Retrieving OTP", { phoneNumber, otp: otpEntry.otp });
+    return otpEntry.otp;
+  }else{
+    console.warn("OTP not found for phone number:", phoneNumber);
+    return null;
+  }
 }
 
 // Function to delete the OTP for a given phone number
-export function deleteOtp(phoneNumber) {
-  const otpData = readOtpFile();
-  delete otpData[phoneNumber];
-  writeOtpFile(otpData);
+export async function deleteOtp(phoneNumber) {
+  const otpData = await readOtpFile();
+  if (otpData[phoneNumber]) {
+    delete otpData[phoneNumber];
+    await writeOtpFile(otpData);
+    console.log("OTP deleted for phone number:", phoneNumber);
+  } else {
+    console.warn("No OTP to delete for phone number:", phoneNumber);
+  }
 }
+
 
 
 
