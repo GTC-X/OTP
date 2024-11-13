@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
 function ContactForm() {
@@ -7,6 +7,7 @@ function ContactForm() {
         mode: "onChange"
     });
     const [otpSent, setOtpSent] = useState(false);
+    const otpRefs = Array.from({ length: 6 }, () => useRef(null));
 
     const onSubmit = (data) => {
         const payload = {
@@ -28,14 +29,20 @@ function ContactForm() {
 
     const handleVerifyOtp = () => {
         alert("OTP Verified!");
-        setOtpSent(false); // Reset OTP state after verification
+        setOtpSent(false);
+    };
+
+    const handleOtpChange = (e, index) => {
+        if (e.target.value.length === 1 && index < otpRefs.length - 1) {
+            otpRefs[index + 1].current.focus();
+        }
     };
 
     return (
         <div className="bg-white relative text-gray-700 rounded-3xl shadow-lg p-8 max-w-3xl mx-auto mb-10 md:mb-14 xl:mb-20 border border-gray-300">
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* First Name & Last Name */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="relative">
                         <p className="text-red-500 text-xs mb-1 min-h-[20px]">{errors.first_name?.message}</p>
                         <input
@@ -57,7 +64,7 @@ function ContactForm() {
                 </div>
 
                 {/* Email */}
-                <div className="relative mb-2">
+                <div className="relative">
                     <p className="text-red-500 text-xs mb-1 min-h-[20px]">{errors.email?.message}</p>
                     <input
                         {...register('email', {
@@ -74,7 +81,7 @@ function ContactForm() {
                 </div>
 
                 {/* Phone with Send OTP Button */}
-                <div className="relative mb-2 flex items-baseline gap-4">
+                <div className="relative flex items-baseline gap-4">
                     <div className="relative flex-grow">
                         <p className="text-red-500 text-xs mb-1 min-h-[20px]">{errors.phone?.message}</p>
                         <input
@@ -95,15 +102,17 @@ function ContactForm() {
 
                 {/* OTP Verification Fields */}
                 {otpSent && (
-                    <div className="flex flex-row justify-between items-center space-y-4">
+                    <div className="flex flex-row justify-between items-baseline space-y-4">
                         <div className="flex gap-2">
                             {[...Array(6)].map((_, index) => (
                                 <input
                                     key={index}
+                                    ref={otpRefs[index]}
                                     type="text"
                                     maxLength="1"
                                     className="w-20 h-12 text-center border rounded-md text-gray-700 focus:outline-none"
                                     placeholder="-"
+                                    onChange={(e) => handleOtpChange(e, index)}
                                 />
                             ))}
                         </div>
@@ -118,7 +127,7 @@ function ContactForm() {
                 )}
 
                 {/* Message */}
-                <div className="relative mb-6">
+                <div className="relative">
                     <p className="text-red-500 text-xs mb-1 min-h-[20px]">{errors.message?.message}</p>
                     <textarea
                         {...register('message', { required: 'Message is required' })}
