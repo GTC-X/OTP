@@ -47,16 +47,20 @@
 // src/app/api/otpStorage.js
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL); // REDIS_URL is your Redis connection string
+const redis = new Redis(process.env.NEXT_PUBLIC_REDIS_URL); // REDIS_URL is your Redis connection string
 
 // Store OTP for a given phone number
 export async function storeOtp(phoneNumber, otp) {
-  await redis.set(phoneNumber, otp, 'EX', 300); // Expire in 5 minutes
+  console.log(`going to set otp ${otp}`);
+  let isSet = await redis.set(phoneNumber, otp, 'EX', 300); // Expire in 5 minutes
+  console.log(`value is set ${isSet}`);
 }
 
 // Retrieve the OTP for a given phone number
 export async function getOtp(phoneNumber) {
-  return await redis.get(phoneNumber);
+  let value =  await redis.get(phoneNumber);
+  console.log(`got otp ${value}`);
+  return value;
 }
 
 // Delete the OTP for a given phone number
