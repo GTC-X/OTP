@@ -58,6 +58,7 @@ export async function storeOtp(phoneNumber, otp) {
 
 // Retrieve the OTP for a given phone number
 export async function getOtp(phoneNumber) {
+  console.log("get otp in",phoneNumber)
   let value =  await redis.get(phoneNumber);
   console.log(`got otp ${value}`);
   return value;

@@ -14,6 +14,7 @@ export async function POST(request) {
 
   // Retrieve stored OTP
   const storedOtp = getOtp(phoneNumber);
+  console.log({ storedOtp })
   if (storedOtp === otp) {
     // OTP is valid, delete it from storage after successful verification
     delete otpStorage[phoneNumber];
