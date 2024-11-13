@@ -1,7 +1,31 @@
+'use client'
 import Link from "next/link";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const HeroBanner = () => {
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+    // Scroll to Contact Us section
+    const handleScrollToContact = (e) => {
+      e.preventDefault();
+      const contactSection = document.getElementById("contactus");
+      contactSection?.scrollIntoView({ behavior: "smooth" });
+    };
+  
+
   return (
     <section className="relative bg-gradient-to-b from-[#080a62] via-[#2a125f] to-[#dc3d52]  text-white py-16 lg:py-32 3xl:py-36">
       <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between px-6 lg:px-12">
@@ -22,10 +46,13 @@ const HeroBanner = () => {
               <span className="font-normal">Innovative, Reliable, and Scalable Technology Services Designed to Accelerate Growth and Drive Success in a Digital World.</span>
             </h2>
           </div>
-          <div className="mt-8 inline-block bg-white hover:bg-secondary text-[#0a0747] font-semibold py-4 px-8 rounded-full text-lg hover:border-white hover:text-white transition w-56 text-center">
-            <Link href="/contact" passHref>
-                Talk to Us!
-            </Link>
+          <div className="mt-8 w-56 text-center mx-auto">
+            <button
+            onClick={handleScrollToContact}
+            className="bg-white rounded-full py-3 px-7 text-primary shadow-2xl  hover:text-white hover:bg-primary transition-all duration-300"
+          >
+            Talk to Us!
+          </button>
           </div>
         </div>
       </div>
