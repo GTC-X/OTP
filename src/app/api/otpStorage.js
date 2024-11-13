@@ -1,5 +1,4 @@
-// src/app/api/otpStorage.js
-import fs from 'fs/promises';  // Using async file operations
+import fs from 'fs/promises';
 import path from 'path';
 
 const otpFilePath = path.resolve('/tmp', 'otp.json');
@@ -7,6 +6,14 @@ const otpFilePath = path.resolve('/tmp', 'otp.json');
 // Helper function to read the current contents of otp.json
 async function readOtpFile() {
   try {
+    // Check if file exists, if not, create an empty JSON file
+    try {
+      await fs.access(otpFilePath);
+    } catch (fileNotExistError) {
+      // If file does not exist, create an empty file
+      await fs.writeFile(otpFilePath, JSON.stringify({}), 'utf8');
+    }
+
     const data = await fs.readFile(otpFilePath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
@@ -36,14 +43,13 @@ export async function storeOtp(phoneNumber, otp) {
 export async function getOtp(phoneNumber) {
   const otpData = await readOtpFile();
   const otpEntry = otpData[phoneNumber];
-  console.log("otpEntry", otpEntry);
+
   if (otpEntry) {
     console.log("Retrieving OTP", { phoneNumber, otp: otpEntry.otp });
     return otpEntry.otp;
-  }else{
-    console.warn("OTP not found for phone number:", phoneNumber);
-    return null;
   }
+  console.warn("OTP not found for phone number:", phoneNumber);
+  return null;
 }
 
 // Function to delete the OTP for a given phone number
@@ -57,6 +63,7 @@ export async function deleteOtp(phoneNumber) {
     console.warn("No OTP to delete for phone number:", phoneNumber);
   }
 }
+
 
 
 
