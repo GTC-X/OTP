@@ -174,7 +174,7 @@ export async function POST(req) {
             ],
             body: {
               "type": "auto",
-              "content": `My first CM.com message ${otp}`
+              "content": ` ${otp} is your GTC verification code.`
             },
             reference: "my_reference_123"
           }
